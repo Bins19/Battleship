@@ -132,7 +132,9 @@ def sauver_result (nom, jeu, nbre):
 
     CU : aucune
     """
-
+    nouvelle_ligne = nom + ':' + jeu + ':' + str(nbre) + ':' + str(datetime.today()) + '\n'
+    with open(FICHIER_RESULT, "a") as fichier:
+        fichier.write(nouvelle_ligne)
 
 
 ###############################################
