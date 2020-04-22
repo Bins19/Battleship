@@ -1,0 +1,4 @@
+5 : 5
+grand : 4
+moyen : 2
+petit : 1
