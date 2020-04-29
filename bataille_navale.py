@@ -247,7 +247,13 @@ def decrire_le_jeu (jeu):
     
     CU : aucune
     """
-
+    print("Dimensions du plateau du jeu : ")
+    print("- largeur :", jeu["plateau"]["larg"])
+    print("- hauteur :", jeu["plateau"]["haut"])
+    print("Navires : ")
+    for cle, valeur in jeu["touches"]["etats_navires"].items():
+        print("-", cle, ":", valeur, "case(s)")
+    print("À vous de jouer en répondant à l'invite ?- par deux nombres séparés par une virgule.")
 
 def lire_un_tir (nom):
     """
@@ -257,8 +263,13 @@ def lire_un_tir (nom):
     CU : l'entrée doit être de la forme xxx,yyy avec xxx et yyy
          une représentation décimale de deux nombres entiers
     """
-
-
+    nbrs = re.compile(r"^[0-9]+,[0-9]+$")
+    entree_std = input()
+    if not nbrs.search(entree_std):
+        raise ValueError("L'entrée doit être de la forme xxx,yyy avec xxx et yyy des entiers")
+    else:
+        entrees = entree_std.split(",")
+        return (int(entrees[0]), int(entrees[1]))
 
 def analyse_un_tir (jeu,tir):
     """
@@ -271,7 +282,23 @@ def analyse_un_tir (jeu,tir):
 
     CU : aucune 
     """
-
+    jeu["coups_joues"].add(tir)
+    pas_touche = True
+    i = 2
+    while i < len(jeu["plateau"]) and pas_touche:
+        if tir == list(jeu["plateau"].keys())[i]:
+            pas_touche = False
+        i += 1
+    if pas_touche:
+        return ("", RATE)
+    else:
+        jeu["touches"]["nb_touches"] += 1
+        nav = list(jeu["plateau"].values())[i-1]
+        jeu["touches"]["etats_navires"][nav] -= 1
+        if jeu["touches"]["etats_navires"][nav] == 0:
+            return (nav, COULE)
+        else:
+            return (nav, TOUCHE)
 
 def tous_coules (jeu):
     """
@@ -281,21 +308,25 @@ def tous_coules (jeu):
 
     CU : aucune
     """
-    return True
-
-
+    coules = True
+    i = 0
+    while i < len(jeu["touches"]["etats_navires"]) and coules:
+        if list(jeu["touches"]["etats_navires"].values())[i] != 0:
+            coules = False
+        i += 1
+    return coules
     
 ###############################################
 # Pour une utilisation du module depuis un terminal
 ###############################################    
 
-# if __name__ == '__main__':
-#     import sys
+if __name__ == '__main__':
+    import sys
 
-#     if len (sys.argv) != 3:
-#         jouer ('Jean Bart','1')
-#     else:
-#         jouer (sys.argv[1],sys.argv[2])
+    if len (sys.argv) != 3:
+        jouer ('Jean Bart','1')
+    else:
+        jouer (sys.argv[1],sys.argv[2])
 
 
 # import sys
