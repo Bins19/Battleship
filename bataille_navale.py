@@ -24,7 +24,7 @@ __date_creation__ = '20/04/2020'
 ###############################################
 
 # Pour la disposition aléatoire des navires
-from random import randint
+import random as r
 
 # Pour le fichier des scores
 from datetime import datetime 
@@ -161,7 +161,8 @@ def cree_jeu (descr):
 
     CU : le fichier doit contenir une description correcte du jeu (cf lire_donnees)
     """
-
+    donnees = lire_donnees(descr)
+    return cree_plateau(donnees[0], donnees[1], donnees[2])
 
 def cree_plateau (l, h, l_nav):
     """
@@ -172,14 +173,44 @@ def cree_plateau (l, h, l_nav):
 
     CU : les dimensions doivent permettre le placement de tous les navires
     """
-
+    esp = dict()
+    esp["plateau"] = {"larg" : l, "haut" : h}
+    esp["nb_cases_occupees"] = 0
+    esp["touches"] = {"nb_touches" : 0, "etats_navires" : {}}
+    esp["coups_joues"] = set()
+    for nav in l_nav:
+        placer(esp, nav)
+    return esp
+    
 def est_placable (esp, nav, pos, disp):
     """
     dict, tuple, tuple, str -> bool
     
     CU : disp = 'H' ou 'V'
     """
-
+    if disp == 'V':
+        if pos[1] + nav[1] - 1 > esp["plateau"]["haut"]:
+            placable = False
+        else:
+            case_pas_occupee = True
+            i = pos[1]
+            while i <= pos[1] + nav[1] - 1 and case_pas_occupee:
+                if (pos[0], i) in list(esp['plateau'].keys())[2:]:
+                    case_pas_occupee = False
+                i += 1
+            placable = case_pas_occupee
+    else:
+        if pos[0] + nav[1] - 1 > esp['plateau']['larg']:
+            placable = False
+        else:
+            case_pas_occupee = True
+            i = pos[0]
+            while i <= pos[0] + nav[1] - 1 and case_pas_occupee:
+                if (i, pos[1]) in list(esp['plateau'].keys())[2:]:
+                    case_pas_occupee = False
+                i += 1
+            placable = case_pas_occupee
+    return placable
 
 def placer (esp, nav):
     """
@@ -189,7 +220,21 @@ def placer (esp, nav):
 
     CU : il doit rester de la place
     """
-
+    largeur = esp["plateau"]["larg"]
+    hauteur = esp["plateau"]["haut"]
+    disp = r.choice(DISPOSITIONS)        
+    pos = (r.randint(1, largeur), r.randint(1, hauteur))
+    while not est_placable(esp, nav, pos, disp):
+        disp = r.choice(DISPOSITIONS)        
+        pos = (r.randint(1, largeur), r.randint(1, hauteur))
+    if disp == "H":
+        for i in range(pos[0], pos[0] + nav[1]):
+            esp["plateau"][(i, pos[1])] = nav[0]
+    if disp == "V":
+        for i in range(pos[1], pos[1] + nav[1]):
+            esp["plateau"][(pos[0], i)] = nav[0]
+    esp["nb_cases_occupees"] += nav[1]
+    esp["touches"]["etats_navires"][nav[0]] = nav[1]
 
 ###############################################
 # Procédures de déroulement du jeu
@@ -253,4 +298,37 @@ def tous_coules (jeu):
 #         jouer (sys.argv[1],sys.argv[2])
 
 
+# import sys
+# import math
+
+# # Auto-generated code below aims at helping you parse
+# # the standard input according to the problem statement.
+
+# l = int(input())
+# h = int(input())
+# a = [[0 for _ in range(l)] for x in range(h)]
+# for i in range(l):
+#     for j, v in enumerate(input().split()):
+#         a[j][i] = int(v)
+        
+# for l in a:
+#     print(*l[::-1])
+
+# import sys
+# import math
+
+# # Auto-generated code below aims at helping you parse
+# # the standard input according to the problem statement.
+
+# n = int(input())
+# l={}
+# for i in range(n):
+#     emoji, code = input().split()
+#     l[''.join(sorted(set(emoji)))]=code
+# s = input().split()
+# for i in l:
+#     for w in range(len(s)):
+#         if i==''.join(sorted(set(s[w]))):s[w]=l[i]
+
+# print(' '.join(s))
 
