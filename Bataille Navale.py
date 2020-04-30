@@ -93,21 +93,54 @@ class Jeu(Frame):
         self.pack ()
         self.nom = nom
         self.version = version
-
-
+        
     def conclure (self,nbre_tirs=1000):
         BN.sauver_result (self.nom, self.version, nbre_tirs)
-        conclusion = Toplevel (self)
-        conclusion.title ('Score')
-        Label (conclusion, text = 'Bravo {0} !\nTu as gagné en {1} tirs'.format(self.nom,nbre_tirs)).grid ()
-        Button (conclusion, text = 'OK', command = quit).grid ()
+        self.conclusion = Toplevel (self)
+        self.conclusion.title ('Score')
+        Label (self.conclusion, text = 'Bravo {0} !\nTu as gagné en {1} tirs'.format(self.nom,nbre_tirs)).grid ()
+        Button (self.conclusion, text = 'OK', command = self.quit).grid ()
+        
+        
+    def quit(self):
+        self.conclusion.destroy()
+        self.master.destroy()
+  
+        
+class Nom(Frame):
+    """
+    """
+    def __init__(self):
+        Frame.__init__(self)
+        self.master.geometry("350x200")
+        self.master.title("Informations")
+        label_nom = Label(self.master, text="Donner votre nom : ")
+        label_nom.place(x=50, y=50)
+        var_nom = StringVar()
+        entree_nom = Entry(self.master, textvariable=var_nom)
+        entree_nom.place(x=160, y=50)
+        label_version = Label(self.master, text="Donner la version : ")
+        label_version.place(x=50, y=100)
+        var_version = StringVar()
+        entree_version = Entry(self.master, textvariable=var_version)
+        entree_version.place(x=160, y=100)
+        button_valider = Button(self.master, text="Valider", command=self.valider)
+        button_valider.place(x=170, y=150)
+        self.nom = var_nom
+        self.version = var_version
+        self.pack()
+        
+    def valider(self):
+        jeu = Jeu(self.nom.get(), self.version.get())
+        self.destroy()
         
 if __name__ == '__main__':
-    import sys
+    # import sys
 
-    if len (sys.argv) != 3:
-        jeu = Jeu ('Jean Bart','2').mainloop ()
-    else:
-        jeu = Jeu (sys.argv[1],sys.argv[2]).mainloop ()
-
+    # if len (sys.argv) != 3:
+    #     jeu = Jeu ('Jean Bart','1').mainloop ()
+    # else:
+    #     jeu = Jeu (sys.argv[1],sys.argv[2]).mainloop ()
+    nom = Nom().mainloop()
+    
 # eof
