@@ -9,6 +9,8 @@ __author__ = 'FIL - IEEA - Univ. Lille1'
 __date_creation__ = 'Tue Feb  3 14:20:23 2015'
 
 from tkinter import *
+from tkinter.ttk import *
+import re
 import bataille_navale as BN
 
 class Plateau (Frame):
@@ -114,33 +116,40 @@ class Nom(Frame):
         Frame.__init__(self)
         self.master.geometry("350x200")
         self.master.title("Informations")
-        label_nom = Label(self.master, text="Donner votre nom : ")
-        label_nom.place(x=50, y=50)
+        self.label_nom = Label(self.master, text="Nom : ")
+        self.label_nom.place(x=60, y=50)
         var_nom = StringVar()
         entree_nom = Entry(self.master, textvariable=var_nom)
         entree_nom.place(x=160, y=50)
-        label_version = Label(self.master, text="Donner la version : ")
-        label_version.place(x=50, y=100)
-        var_version = StringVar()
-        entree_version = Entry(self.master, textvariable=var_version)
-        entree_version.place(x=160, y=100)
+        self.label_version = Label(self.master, text="Version : ")
+        self.label_version.place(x=60, y=100)
+        liste_versions = Combobox(self.master, values=["Choisir une version : ", "1", "2", "3"])
+        liste_versions.place(x=160, y=100)
+        liste_versions.current(0)
         button_valider = Button(self.master, text="Valider", command=self.valider)
         button_valider.place(x=170, y=150)
         self.nom = var_nom
-        self.version = var_version
+        self.versions = liste_versions
         self.pack()
         
     def valider(self):
-        jeu = Jeu(self.nom.get(), self.version.get())
-        self.destroy()
+        nbr = re.compile(r"[0-9]")
+        nom = re.compile(r"^$")
+        if nbr.search(self.versions.get()) and not nom.search(self.nom.get()):
+            jeu = Jeu(self.nom.get(), self.versions.get())
+            self.destroy()
+        else:
+            if nom.search(self.nom.get()):
+                self.label_nom["text"] = "Donner un nom svp : "
+                self.label_nom["foreground"] = "red"
+                self.label_nom.place(x=10, y=50)
+            if not nbr.search(self.versions.get()):
+                self.label_version["text"] = "Choisissez une version svp : "
+                self.label_version["foreground"] = "red"
+                self.label_version.place(x=10, y=100)
+            
         
 if __name__ == '__main__':
-    # import sys
-
-    # if len (sys.argv) != 3:
-    #     jeu = Jeu ('Jean Bart','1').mainloop ()
-    # else:
-    #     jeu = Jeu (sys.argv[1],sys.argv[2]).mainloop ()
     nom = Nom().mainloop()
     
 # eof
